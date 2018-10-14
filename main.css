@@ -1,0 +1,28 @@
+#ruller {
+	background: url('./sprite.png');
+	width: 875px;
+	height: 85px;
+	position: absolute;
+	top: 220px;
+}
+#myCanvas {
+	margin-left: 40px
+}
+.inputField {
+	position: absolute;
+	width: 25px;
+	height: 25px;
+	text-align: center;
+}
+#container {
+	position: relative;
+}
+
+input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+input[type="number"] {
+	-moz-appearance: textfield;
+}
