@@ -7,6 +7,9 @@ const INITIAL_STATE = {
   MIN_SUM: 11,
   MAX_SUM: 14
 };
+// INITIALISATION
+
+init(INITIAL_STATE);
 
 function init(state) {
   const firstValue = randomNumber(state.MIN_A, state.MAX_A);
@@ -15,44 +18,58 @@ function init(state) {
   initSpans(firstValue, secondValue);
   const firstElement = createArc(firstValue);
 
-
-  createInput(firstElement.radius, firstElement.x)
-	  .addEventListener('keyup', (e) => {
-		e.target.style.color = 'black';
-		if (+e.target.value === firstValue) {	
-			e.target.disabled = true
-			const secondElement = createArc(secondValue, firstElement.x);
-			createInput(secondElement.radius, secondElement.x).addEventListener('keyup', (e) => {
-				if(+e.target.value === secondValue - firstValue) {
-					e.target.disabled = true;
-					document.getElementById('result').innerHTML = '';
-					document.getElementById('result').appendChild(document.createElement('input')).addEventListener('keyup', (e) => {
-						if (+e.target.value === secondValue) {
-							e.target.disabled = true
-						}
-					})
-				}
-			});
-		} else {
-			e.target.style.color = 'red'
-		}
-		
-	});
-  
+  createInput(firstElement.radius, firstElement.x).addEventListener(
+    "keyup",
+    e => {
+      validation(e.target, firstValue)
+        .then(() => {
+          const secondElement = createArc(secondValue, firstElement.x);
+          createInput(secondElement.radius, secondElement.x).addEventListener(
+            "keyup",
+            e => {
+              validation(e.target, secondValue - firstValue).then(() => {
+                const inputResult = document.createElement("input");
+               //  inputResult.setAttribute("class", "inputField");
+                document.getElementById("result").innerHTML = "";
+                document
+                  .getElementById("result")
+                  .appendChild(inputResult)
+                  .addEventListener("keyup", e => {
+                    validation(e.target, secondValue);
+                  });
+              });
+            }
+          );
+        })
+        .catch(element => {
+          console.error(element);
+        });
+    }
+  );
 }
-init(INITIAL_STATE)
+
+
+function validation(target, expect) {
+  target.style.color = "black";
+  if (+target.value !== expect) {
+    target.style.color = "red";
+    return Promise.reject(target);
+  }
+  target.disabled = true;
+  return Promise.resolve();
+}
 
 /**
- * 
- * @param {number} firstValue 
- * @param {number} secondValue 
+ *
+ * @param {number} firstValue
+ * @param {number} secondValue
  */
-function initSpans (firstValue, secondValue) {
-	document.getElementById('first').innerHTML = firstValue + ' + '
-	document.getElementById('second').innerHTML = secondValue - firstValue + ' = '
-	document.getElementById('result').innerHTML = ' ?'
+function initSpans(firstValue, secondValue) {
+  document.getElementById("first").innerHTML = firstValue + " + ";
+  document.getElementById("second").innerHTML =
+    secondValue - firstValue + " = ";
+  document.getElementById("result").innerHTML = " ?";
 }
-
 
 function randomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -94,21 +111,18 @@ function createArc(inputValue, startPosition = 0) {
  *
  * @param {number} radius
  * @param {number} position
- * @param {string} id
  */
-function createInput(radius, position = 0, id) {
+function createInput(radius, position = 0) {
   let container, input;
 
   input = document.createElement("input");
-  input.setAttribute('type', 'number')
+  input.setAttribute("type", "number");
   input.setAttribute("class", "inputField");
-  if (id) {
-    input.setAttribute("id", id);
-  }
+
   input.style.bottom = radius - 10 + "px";
   input.style.left = position + 30 + "px";
 
   container = document.getElementById("container");
   container.appendChild(input);
-  return input
+  return input;
 }
