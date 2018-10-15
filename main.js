@@ -14,49 +14,68 @@ init(INITIAL_STATE);
 function init(state) {
   const firstValue = randomNumber(state.MIN_A, state.MAX_A);
   const secondValue = randomNumber(state.MIN_SUM, state.MAX_SUM);
+  const container = document.getElementById("container");
 
+  //слушатель на котейнер для валидаций инпутов
+  container.addEventListener("keyup", validation);
   initSpans(firstValue, secondValue);
-  const firstElement = createArc(firstValue);
 
-  createInput(firstElement.radius, firstElement.x).addEventListener(
-    "keyup",
-    e => {
-      validation(e.target, firstValue)
-        .then(() => {
-          const secondElement = createArc(secondValue, firstElement.x);
-          createInput(secondElement.radius, secondElement.x).addEventListener(
-            "keyup",
-            e => {
-              validation(e.target, secondValue - firstValue).then(() => {
-                const inputResult = document.createElement("input");
-               //  inputResult.setAttribute("class", "inputField");
-                document.getElementById("result").innerHTML = "";
-                document
-                  .getElementById("result")
-                  .appendChild(inputResult)
-                  .addEventListener("keyup", e => {
-                    validation(e.target, secondValue);
-                  });
-              });
-            }
-          );
-        })
-        .catch(element => {
-          console.error(element);
-        });
-    }
+  const firstElement = createArc(firstValue);
+  const secondElement = createArc(secondValue, firstElement.x);
+
+  const input_1 = createInput(
+    firstElement.radius,
+    firstElement.x,
+    firstValue,
+	 "first",
   );
+  const input_2 = createInput(
+    secondElement.radius,
+    secondElement.x,
+    secondValue - firstValue,
+    "second"
+  );
+  input_1.hidden = false;
+  
+
+  container.appendChild(input_1);
+  container.appendChild(input_2);
+
+  const inputResult = document.createElement("input");
+  inputResult.setAttribute('data-value', secondValue);
+  inputResult.setAttribute('data-link', 'result');
+  inputResult.hidden = true;
+  document
+    .getElementById("result")
+    .appendChild(inputResult)
 }
 
-
-function validation(target, expect) {
+function validation(event) {
+  const target = event.target;
+  const linkedElement = document.getElementById(target.dataset.link);
   target.style.color = "black";
-  if (+target.value !== expect) {
+  if (target.value !== target.dataset.value) {
+    linkedElement.style.background = "yellow";
     target.style.color = "red";
-    return Promise.reject(target);
+    return 
   }
+  linkedElement.style.background = "transparent";
   target.disabled = true;
-  return Promise.resolve();
+  showNextStep(target.dataset.link)
+}
+
+function showNextStep(name) {
+	if(name === 'first') {
+		const secondInput = document.querySelector("[data-link='second']");
+		secondInput.hidden = false;
+		secondInput.focus();
+	} else if(name === 'second') {
+		const resultInput = document.querySelector("[data-link='result']");
+		const firstResultChild = document.getElementById("result").firstChild
+		document.getElementById("result").replaceChild(resultInput, firstResultChild)
+		resultInput.hidden = false;
+		resultInput.focus();
+	}
 }
 
 /**
@@ -65,10 +84,11 @@ function validation(target, expect) {
  * @param {number} secondValue
  */
 function initSpans(firstValue, secondValue) {
-  document.getElementById("first").innerHTML = firstValue + " + ";
+	document.getElementById('expression').hidden = false;
+  document.getElementById("first").innerHTML = firstValue;
   document.getElementById("second").innerHTML =
-    secondValue - firstValue + " = ";
-  document.getElementById("result").innerHTML = " ?";
+    secondValue - firstValue;
+  document.getElementById("result").innerHTML = "<span> ? </span>";
 }
 
 function randomNumber(min, max) {
@@ -111,18 +131,17 @@ function createArc(inputValue, startPosition = 0) {
  *
  * @param {number} radius
  * @param {number} position
+ * @param {number} value
  */
-function createInput(radius, position = 0) {
-  let container, input;
-
-  input = document.createElement("input");
+function createInput(radius, position = 0, value, linkedId) {
+  let input = document.createElement("input");
   input.setAttribute("type", "number");
   input.setAttribute("class", "inputField");
-
+  input.setAttribute("data-link", linkedId);
+  input.setAttribute("data-value", value);
+  input.hidden = true;
   input.style.bottom = radius - 10 + "px";
   input.style.left = position + 30 + "px";
 
-  container = document.getElementById("container");
-  container.appendChild(input);
   return input;
 }
