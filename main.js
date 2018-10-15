@@ -44,6 +44,7 @@ function init(state) {
   const inputResult = document.createElement("input");
   inputResult.setAttribute('data-value', secondValue);
   inputResult.setAttribute('data-link', 'result');
+  inputResult.setAttribute('class', 'lastInput');
   inputResult.hidden = true;
   document
     .getElementById("result")
@@ -119,7 +120,7 @@ function createArc(inputValue, startPosition = 0) {
   context.lineWidth = 1;
 
   // line color
-  context.strokeStyle = "black";
+  context.strokeStyle = "red";
   context.stroke();
   return {
     x,

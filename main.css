@@ -29,3 +29,20 @@ input[type="number"] {
 .warning {
 	color: red;
 }
+#container {
+	margin: 200px;
+}
+#expression {
+	margin-left: 350px;
+}
+
+#result {
+	width:30px;
+	height:30px;
+}
+.lastInput{
+	width: 30px;
+	height: 30px;
+	font-size: 15px;
+	text-align: center;
+}
